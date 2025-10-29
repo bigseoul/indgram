@@ -1,0 +1,16 @@
+[project]
+name = "indgram"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "dart-fss>=0.4.14",
+    "ipykernel>=7.1.0",
+    "jupyter>=1.1.1",
+    "networkx>=3.5",
+    "numpy>=2.3.4",
+    "opendartreader>=0.2.3",
+    "pandas>=2.3.3",
+    "pyarrow>=22.0.0",
+]

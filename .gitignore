@@ -119,3 +119,15 @@ Thumbs.db
 # tasks.json
 # tasks/ 
 .serena/
+
+# Data files
+data/
+*.csv
+*.json
+*.xlsx
+*.xls
+*.txt
+*.log
+*.err
+*.out
+*.log.*

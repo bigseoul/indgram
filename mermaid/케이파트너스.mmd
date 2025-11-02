@@ -1,0 +1,89 @@
+graph LR
+
+    %% 주주 구조
+    A["권경훈"] -->|63.67%| KP["케이파트너스(주)"]
+    B["김정규"] -->|29.25%| KP
+    C["김동준"] -->|7.08%| KP
+    
+    %% 핵심 축 (가로 중앙 배치 및 강조)
+    KP ==|29.49%|==> KR["(주)큐로홀딩스"]
+    KR ==|20.51%|==> CREO["(주)크레오에스지"]
+    CREO ==|30.63%|==> GN["(주)지엔코"]
+    GN ==|39.16%|==> QCP["큐캐피탈파트너스(주)"]
+    
+    %% 케이파트너스의 다른 직접 출자
+    KP -->|9.19%| CREO
+    KP -->|4.63%| GN
+    KP -->|41.85%| IF["Inferrex Ltd."]
+    KP -->|33.33%| PL["(주)필리에라"]
+    KP -->|50.00%| YJ["(주)홍익재"]
+    
+    %% 큐로홀딩스 산하 계열사
+    KR -->|63.65%| CE["Curocom Energy LLC"]
+    KR -->|94.10%| KT["(주)큐로트레이더스"]
+    KR -->|59.08%| QB["큐비트(주)"]
+    KR -->|51.71%| EW["(주)에이트웍스"]
+    KR -->|41.42%| KFNB["(주)큐로에프앤비"]
+    KR -->|33.33%| PL
+    KR -->|49.00%| BU["블록체인유니버스(주)"]
+    KR -->|22.50%| KP2["케이피(주)"]
+    KR -->|18.18%| ONE["(주)더원게임즈"]
+    KR -->|11.46%| JP["일본정밀(주)"]
+    KR -->|17.39%| HK["(주)헤베코리아"]
+    
+    %% 크레오에스지 산하 계열사
+    CREO -->|100.00%| CEST["(주)크레오에스테이트"]
+    CREO -->|100.00%| SUM["SUMAGEN CANADA INC."]
+    CREO -->|51.44%| IF
+    CREO -->|38.47%| KFNB
+    CREO -->|9.04%| QB
+    CREO -->|3.56%| KT
+    
+    %% 지엔코 산하 계열사
+    GN -->|100.00%| GNT["지엔코국제무역(닝보)유한공사"]
+    GN -->|100.00%| CV["Curo Vestis Inc."]
+    GN -->|100.00%| QM["큐로모터스(주)"]
+    GN -->|27.80%| JP
+    GN -->|25.72%| CE
+    GN -->|19.98%| KFNB
+    GN -->|24.63%| EW
+    GN -->|2.34%| KT
+    
+    %% 순환 구조 (점선으로 강조, 라벨에 순환 표시)
+    CREO -.->|8.29% 순환| KR
+    GN -.->|8.98% 순환| KR
+    QCP -.->|3.97% 순환| KR
+    QCP -.->|4.07% 순환| CREO
+    QCP -.->|특수관계자 순환| KP
+    
+    %% 기타 교차투자 구조 (일반 점선)
+    KFNB -.->|0.71%| KR
+    
+    %% 스타일 정의
+    classDef shareholder fill:#e6e6fa,stroke:#333,stroke-width:2px
+    classDef parent fill:#ffc0cb,stroke:#333,stroke-width:4px
+    classDef coreAxis fill:#ffd700,stroke:#ff6b00,stroke-width:5px,color:#000
+    classDef subsidiary fill:#87ceeb,stroke:#333,stroke-width:2px
+    classDef tier3 fill:#ffe4b5,stroke:#333,stroke-width:1px
+    classDef tier4 fill:#f0f8ff,stroke:#333,stroke-width:1px
+    
+    %% 스타일 적용
+    class A,B,C shareholder
+    class KP parent
+    class KR,CREO,GN,QCP coreAxis
+    class IF,PL,YJ subsidiary
+    class CE,KT,QB,EW,KFNB,BU,KP2,ONE,JP,HK,CEST,SUM,GNT,CV,QM tier3
+
+%% OXDRAW LAYOUT START
+%% {
+%%   "nodes": {
+%%     "A": {
+%%       "x": 230.0,
+%%       "y": 150.0
+%%     }
+%%   },
+%%   "edges": {},
+%%   "node_styles": {},
+%%   "edge_styles": {}
+%% }
+%% OXDRAW LAYOUT END

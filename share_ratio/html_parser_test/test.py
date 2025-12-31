@@ -25,7 +25,7 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Extract tables whose previous context contains a keyword."
     )
-    default_source = Path(__file__).resolve().parent / "에이치엘제3호위탁관리부동산투자회사.html"
+    default_source = Path(__file__).resolve().parent / "kpartners.html"
     parser.add_argument(
         "--source",
         type=Path,

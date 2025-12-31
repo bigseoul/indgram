@@ -131,3 +131,6 @@ data/
 *.err
 *.out
 *.log.*
+
+# Cursor
+.cursor/

@@ -116,7 +116,7 @@ if __name__ == "__main__":
     from pathlib import Path
 
     # 하드코딩된 테스트 파일 경로
-    test_file = Path(__file__).resolve().parent / "에스제이프라퍼티.html"
+    test_file = Path(__file__).resolve().parent / "kpartners.html"
 
     if not test_file.exists():
         print(f"Error: {test_file} 파일을 찾을 수 없습니다.")

@@ -23,54 +23,73 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 
-class ShareholderInfo(BaseModel):
-    name: str = Field(description="주주명 또는 주체명")
-    share_ratio: float = Field(
-        description="지분율 (단위: %, 100%인 경우 100.0으로 표기)"
+class ShareholderItem(BaseModel):
+    shareholder: str = Field(description="주주명 또는 주체명")
+    ownership_ratio: float = Field(description="지분율 (단위: %)")
+
+
+class InvestmentItem(BaseModel):
+    investee: str = Field(description="피투자회사명")
+    ownership_ratio: float = Field(description="지분율 (단위: %)")
+
+
+class CorporateStructure(BaseModel):
+    corp_name: str = Field(description="대상 회사명")
+    as_of_date: Optional[str] = Field(None, description="기준일 (YYYY-MM-DD)")
+    major_shareholders: List[ShareholderItem] = Field(
+        description="최대주주 및 주요 주주 현황"
     )
-    description: Optional[str] = Field(
-        None, description="추가 설명 (예: 특수관계자 포함 여부 등)"
-    )
+    investments: List[InvestmentItem] = Field(description="타법인 출자 현황")
 
 
-class CorporateOverview(BaseModel):
-    company_name: str = Field(description="회사명")
-    foundation_date: Optional[str] = Field(None, description="설립일")
-    major_shareholders: List[ShareholderInfo] = Field(
-        description="주요 주주 및 지분율 정보"
-    )
-
-
-def extract_share_ratio_with_llm(context_data: str) -> CorporateOverview:
-    """Gemini를 사용하여 추출된 증거 데이터에서 지분율 정보를 구조화함"""
-    # 2026년 가용 모델인 gemini-3-flash-preview 사용
-    model_name = "models/gemini-3-flash-preview"
-    print(f"Using model: {model_name}", flush=True)
+def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
+    """Gemini를 사용하여 추출된 증거 데이터에서 지분 구조를 분석함"""
+    # model_name = "models/gemini-3-flash-preview"
+    model_name = "models/gemini-2.5-flash-lite"
     model = genai.GenerativeModel(model_name)
 
     prompt = f"""
-    당신은 기업 공시 분석 전문가입니다. 아래 제공된 [증거 데이터]를 분석하여 회사명, 설립일, 주요 주주의 지분율 정보를 추출하십시오.
+너는 기업 지분 구조를 분석하는 전문가다.
+회계 처리나 재무 기준 해석은 하지 않는다.
+주어진 데이터에 포함된 지분율 관계만을 기반으로
+지배 구조를 명확하고 간결하게 요약한다.
+추측이나 외부 정보는 사용하지 않는다.
+전기말 또는 비교 정보는 포함되어 있지 않다. 
+당기 또는 당기말 기준으로 정보를 추출한다.
 
-    [주의 사항]
-    - 지분율이 '전부', '100%', '전량' 등으로 표현된 경우 100.0으로 해석하십시오.
-    - 보통주와 우선주가 나뉘어 있다면 합산하지 말고 '보통주' 기준으로 우선 추출하십시오.
+[증거 데이터]
+{context_data}
 
-    [증거 데이터]
-    {context_data}
+위 데이터를 기반으로 다음을 수행하라.
 
-    반드시 아래 JSON 스키마를 따르는 JSON 형식으로만 응답하세요:
+1. 해당 회사의 최대주주와 지분율을 명확히 정리하라.
+2. 해당 회사가 지분을 보유한 회사들과 각 지분율을 나열하라.
+
+주의사항:
+- 지분율 숫자를 반드시 포함할 것
+- 회계 용어 사용 금지
+- 추정이나 가능성 표현 금지
+- 제공된 데이터 범위를 벗어나지 말 것
+- 지분율이 '전부', '100%', '전량' 등으로 표현된 경우 100.0으로 해석할 것
+
+반드시 아래 JSON 스키마를 따르는 JSON 형식으로만 응답하세요:
+{{
+  "corp_name": "대상 회사명",
+  "as_of_date": "YYYY-MM-DD 또는 null",
+  "major_shareholders": [
     {{
-        "company_name": "회사명",
-        "foundation_date": "YYYY-MM-DD 또는 null",
-        "major_shareholders": [
-            {{
-                "name": "주주명",
-                "share_ratio": float (단위: %),
-                "description": "추가 맥락 및 메모 또는 null"
-            }}
-        ]
+      "shareholder": "주주명",
+      "ownership_ratio": float,
     }}
-    """
+  ],
+  "investments": [
+    {{
+      "investee": "피투자회사명",
+      "ownership_ratio": float
+    }}
+  ]
+}}
+"""
 
     try:
         response = model.generate_content(prompt)
@@ -86,7 +105,7 @@ def extract_share_ratio_with_llm(context_data: str) -> CorporateOverview:
         elif "```" in text:
             text = text.split("```")[1].split("```")[0].strip()
 
-        return CorporateOverview.model_validate_json(text)
+        return CorporateStructure.model_validate_json(text)
     except Exception as e:
         print(f"LLM 처리 중 오류 발생: {e}", flush=True)
         raise

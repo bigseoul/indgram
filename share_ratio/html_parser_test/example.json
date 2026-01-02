@@ -1,0 +1,47 @@
+{
+    "corp_name": "Unknown",
+    "as_of_date": "2024-12-31",
+    "major_shareholders": [
+        {
+            "shareholder": "권경훈",
+            "ownership_ratio": 63.67,
+            "is_controlling_shareholder": true
+        },
+        {
+            "shareholder": "김정규",
+            "ownership_ratio": 29.25,
+            "is_controlling_shareholder": false
+        },
+        {
+            "shareholder": "김동준",
+            "ownership_ratio": 7.08,
+            "is_controlling_shareholder": false
+        }
+    ],
+    "investments": [
+        {
+            "investee": "(주)크레오에스지",
+            "ownership_ratio": 9.19
+        },
+        {
+            "investee": "(주)큐로홀딩스",
+            "ownership_ratio": 27.54
+        },
+        {
+            "investee": "Inferrex,Ltd.",
+            "ownership_ratio": 41.85
+        },
+        {
+            "investee": "(주)필리에라",
+            "ownership_ratio": 33.33
+        },
+        {
+            "investee": "(주)지엔코",
+            "ownership_ratio": 4.63
+        },
+        {
+            "investee": "(주)홍익재",
+            "ownership_ratio": 50.0
+        }
+    ]
+}

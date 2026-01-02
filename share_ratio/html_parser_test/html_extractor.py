@@ -1,4 +1,3 @@
-import copy
 import re
 
 from bs4 import BeautifulSoup, Tag
@@ -12,16 +11,30 @@ def _normalize(text: str) -> str:
 
 
 def _clean_table_html(table_tag: Tag) -> str:
-    """테이블에서 디자인 속성을 제거하고 구조(rowspan, colspan)만 남김"""
-    table_copy = copy.deepcopy(table_tag)
-    for tag in table_copy.find_all(True):
-        allowed_attrs = {
-            k: v for k, v in tag.attrs.items() if k in ["rowspan", "colspan"]
-        }
-        tag.attrs = allowed_attrs
-    cleaned_html = str(table_copy)
-    cleaned_html = re.sub(r">\s+<", "><", cleaned_html)
-    return cleaned_html.strip()
+    """
+    테이블의 불필요한 태그와 속성을 모두 제거하고,
+    LLM이 구조를 파악할 수 있는 최소한의 마크업만 남겨 토큰을 절약함.
+    """
+    rows = []
+    for tr in table_tag.find_all("tr"):
+        cells = []
+        for td in tr.find_all(["td", "th"]):
+            # colspan, rowspan은 구조 파악에 핵심적이므로 짧은 속성명으로 유지
+            cs = td.get("colspan")
+            rs = td.get("rowspan")
+            attr = ""
+            if cs:
+                attr += f' c="{cs}"'
+            if rs:
+                attr += f' r="{rs}"'
+
+            content = _normalize(td.get_text())
+            cells.append(f"<td{attr}>{content}</td>")
+        if cells:
+            rows.append(f"<tr>{''.join(cells)}</tr>")
+
+    # 공백을 최소화한 한 줄의 문자열로 반환
+    return f"<table>{''.join(rows)}</table>"
 
 
 def _get_company_name(soup: BeautifulSoup) -> str:
@@ -44,7 +57,9 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
     날짜, 단위 등 주변 문맥(Context)을 포함하도록 개선됨.
     """
     company_name = _get_company_name(soup)
-    keywords = ["지분율", "주주명"]
+    keywords = ["지분율", "100%"]
+    candidates_keywords = ["지분의", "100%의"]
+
     evidence = [f"[COMPANY NAME]\n{company_name}"]
     seen_elements = set()
 
@@ -116,7 +131,7 @@ if __name__ == "__main__":
     from pathlib import Path
 
     # 하드코딩된 테스트 파일 경로
-    test_file = Path(__file__).resolve().parent / "kpartners.html"
+    test_file = Path(__file__).resolve().parent / "sample" / "sample.html"
 
     if not test_file.exists():
         print(f"Error: {test_file} 파일을 찾을 수 없습니다.")

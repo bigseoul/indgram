@@ -45,34 +45,35 @@ class CorporateStructure(BaseModel):
 def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
     """Gemini를 사용하여 추출된 증거 데이터에서 지분 구조를 분석함"""
     # model_name = "models/gemini-3-flash-preview"
-    model_name = "models/gemini-2.5-flash-lite"
+    model_name = "models/gemini-2.5-flash"
     model = genai.GenerativeModel(model_name)
 
     prompt = f"""
-너는 기업 지분 구조를 분석하는 전문가다.
-회계 처리나 재무 기준 해석은 하지 않는다.
-주어진 데이터에 포함된 지분율 관계만을 기반으로
-지배 구조를 명확하고 간결하게 요약한다.
-추측이나 외부 정보는 사용하지 않는다.
-전기말 또는 비교 정보는 포함되어 있지 않다. 
-당기 또는 당기말 기준으로 정보를 추출한다.
+너는 기업 지분 구조 및 타법인 출자 현황 분석 전문가다.
+주어진 데이터에서 오직 '자본(Equity) 관계'인 지분 보유 현황만을 추출한다.
+회계 기준 해석이나 재무적 판단은 하지 않는다.
+
+[필수 추출 및 제외 규칙]
+1. 포함 대상: '주식'을 소유하고 있으며 '지분율(%)'이 명확히 제시된 관계만 추출한다.
+2. 제외 대상: 대출, 대여금, 미수금, 사채(CB/BW 등), 담보 제공 등 '채권(Debt)' 관계는 절대 포함하지 않는다.
+3. 행 제외 규칙: 데이터 표에 포함된 '합계', '소계', 'Total' 행은 데이터로 추출하지 않는다.
+4. 기준 시점: '전기' 또는 '비교' 정보는 무시하고, '당기(당기말)' 기준 정보만 추출한다.
+5. 수치 해석 및 형식:
+   - 우선주 또는 종류주식이 별도로 존재하더라도, 본 추출에서는 보통주 기준 지분율만 사용한다.
+   - 지분율이 '전부', '100%', '전량'으로 표기된 경우 100.0으로 기재한다.
+   - 모든 ownership_ratio는 float 형식의 숫자로 기재하며, 따옴표("")를 사용하지 않는다.
+6. 지분율 숫자가 명확히 제시되지 않은 항목은 제외한다.
+7. 최대주주는 제공된 데이터에 포함된 주주 전원을 의미한다.
+8. 제공된 증거 데이터 범위를 벗어난 정보는 절대 추가하지 않는다.
+9. 회사명(corp_name)은 증거 데이터에 명시적으로 등장한 회사명만 사용하며 추정하지 않는다.
+10. 기준일(as_of_date)이 증거 데이터에 명시되지 않은 경우 null로 기재한다.
 
 [증거 데이터]
 {context_data}
 
-위 데이터를 기반으로 다음을 수행하라.
+반드시 아래 JSON 스키마를 따르는 JSON 형식으로만 응답하라.
+설명, 해석, 서술 문장은 절대 포함하지 말 것.
 
-1. 해당 회사의 최대주주와 지분율을 명확히 정리하라.
-2. 해당 회사가 지분을 보유한 회사들과 각 지분율을 나열하라.
-
-주의사항:
-- 지분율 숫자를 반드시 포함할 것
-- 회계 용어 사용 금지
-- 추정이나 가능성 표현 금지
-- 제공된 데이터 범위를 벗어나지 말 것
-- 지분율이 '전부', '100%', '전량' 등으로 표현된 경우 100.0으로 해석할 것
-
-반드시 아래 JSON 스키마를 따르는 JSON 형식으로만 응답하세요:
 {{
   "corp_name": "대상 회사명",
   "as_of_date": "YYYY-MM-DD 또는 null",
@@ -113,7 +114,7 @@ def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
 
 def main():
     # 파일 경로 설정
-    source_file = Path(__file__).resolve().parent / "kpartners.html"
+    source_file = Path(__file__).resolve().parent / "sample" / "sample.html"
 
     if not source_file.exists():
         print(f"Error: {source_file} 파일을 찾을 수 없습니다.")
@@ -136,8 +137,16 @@ def main():
     print("Sending to LLM for structured analysis...", flush=True)
     try:
         result = extract_share_ratio_with_llm(context_data)
+
+        json_output = result.model_dump_json(indent=2, ensure_ascii=False)
         print("\n--- Final Structured Result ---", flush=True)
-        print(result.model_dump_json(indent=2, ensure_ascii=False), flush=True)
+        print(json_output, flush=True)
+
+        # 파일 저장
+        output_file = source_file.parent / "result_gemini.json"
+        output_file.write_text(json_output, encoding="utf-8")
+        print(f"\n[INFO] Result saved to: {output_file}", flush=True)
+
     except Exception as e:
         print(f"Main loop error: {e}", flush=True)
 

@@ -57,7 +57,7 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
     날짜, 단위 등 주변 문맥(Context)을 포함하도록 개선됨.
     """
     company_name = _get_company_name(soup)
-    keywords = ["지분율", "100%"]
+    keywords = ["지분율", "1. 일반사항", "1. 회사의 개요"]
     candidates_keywords = ["지분의", "100%의"]
 
     evidence = [f"[COMPANY NAME]\n{company_name}"]

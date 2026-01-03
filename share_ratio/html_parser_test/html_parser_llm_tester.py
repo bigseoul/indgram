@@ -15,20 +15,10 @@ if str(current_dir) not in sys.path:
 def print_comparison_table(gemini_res, gpt_res):
     """Gemini와 ChatGPT의 결과를 나란히 출력하는 함수"""
     print("\n" + "=" * 110)
-    print(f"{'항목':<20} | {'Gemini (2.5-flash)':<40} | {'ChatGPT (4o-mini)':<40}")
+    print(f"{'항목':<20} | {'Gemini':<40} | {'ChatGPT':<40}")
     print("-" * 110)
 
-    # 1. 대상 회사명 비교
-    corp_match = "✅" if gemini_res.corp_name == gpt_res.corp_name else "❌"
-    print(
-        f"{'corp_name':<20} | {gemini_res.corp_name:<40} | {gpt_res.corp_name:<40} {corp_match}"
-    )
-
-    # 2. 기준일 비교
-    date_match = "✅" if gemini_res.as_of_date == gpt_res.as_of_date else "❌"
-    print(
-        f"{'as_of_date':<20} | {str(gemini_res.as_of_date):<40} | {str(gpt_res.as_of_date):<40} {date_match}"
-    )
+    print("-" * 110)
 
     print("-" * 110)
     print(f"{'[주요 주주]':<20}")

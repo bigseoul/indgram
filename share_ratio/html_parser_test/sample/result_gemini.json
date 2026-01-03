@@ -1,11 +1,44 @@
 {
-  "corp_name": "지멘스에너지 유한회사",
-  "as_of_date": "2025-09-30",
+  "corp_name": null,
+  "as_of_date": null,
   "major_shareholders": [
     {
-      "shareholder": "Siemens Energy Holding B.V.",
-      "ownership_ratio": 100.0
+      "shareholder": "권경훈",
+      "ownership_ratio": 63.67
+    },
+    {
+      "shareholder": "김정규",
+      "ownership_ratio": 29.25
+    },
+    {
+      "shareholder": "김동준",
+      "ownership_ratio": 7.08
     }
   ],
-  "investments": []
+  "investments": [
+    {
+      "investee": "크레오에스지",
+      "ownership_ratio": 9.19
+    },
+    {
+      "investee": "큐로홀딩스",
+      "ownership_ratio": 27.54
+    },
+    {
+      "investee": "Inferrex, Ltd.",
+      "ownership_ratio": 41.85
+    },
+    {
+      "investee": "필리에라",
+      "ownership_ratio": 33.33
+    },
+    {
+      "investee": "지엔코",
+      "ownership_ratio": 4.63
+    },
+    {
+      "investee": "홍익재",
+      "ownership_ratio": 50.0
+    }
+  ]
 }

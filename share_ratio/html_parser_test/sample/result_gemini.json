@@ -1,20 +1,11 @@
 {
-  "corp_name": "한국피셔로즈마운트주식회사",
+  "corp_name": "지멘스에너지 유한회사",
   "as_of_date": "2025-09-30",
   "major_shareholders": [
     {
-      "shareholder": "Rosemount Inc.",
-      "ownership_ratio": 70.0
-    },
-    {
-      "shareholder": "Emerson Electric Co.",
-      "ownership_ratio": 30.0
-    }
-  ],
-  "investments": [
-    {
-      "investee": "주식회사 아벤틱스",
+      "shareholder": "Siemens Energy Holding B.V.",
       "ownership_ratio": 100.0
     }
-  ]
+  ],
+  "investments": []
 }

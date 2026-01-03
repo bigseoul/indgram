@@ -3,7 +3,6 @@ Palantir Foundry 다운로더 사용 예제
 """
 
 from download import download_dataset
-from pathlib import Path
 
 
 def example_basic_download():

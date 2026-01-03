@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+import html_parser_chatgpt
+import html_parser_gemini
 from bs4 import BeautifulSoup
 from html_extractor import extract_evidence_blocks
 
@@ -8,9 +10,6 @@ from html_extractor import extract_evidence_blocks
 current_dir = Path(__file__).resolve().parent
 if str(current_dir) not in sys.path:
     sys.path.append(str(current_dir))
-
-import html_parser_chatgpt
-import html_parser_gemini
 
 
 def print_comparison_table(gemini_res, gpt_res):

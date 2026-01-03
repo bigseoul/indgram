@@ -67,7 +67,7 @@ def download_dataset(
     try:
         # 1. Foundry REST API로 파일 목록 조회
         files_url = f"https://{hostname}/foundry-api/api/datasets/{dataset_rid}/branches/{branch}/files"
-        print(f"파일 목록 조회 중...")
+        print("파일 목록 조회 중...")
         print(f"URL: {files_url}")
 
         # 시도할 브랜치 목록
@@ -110,7 +110,7 @@ def download_dataset(
                         successful_branch = (
                             branch_name if "{branch}" in pattern else "N/A"
                         )
-                        print(f"✅ 성공!")
+                        print("✅ 성공!")
                         break
                     else:
                         print(f"❌ 실패 (상태 코드: {response.status_code})")
@@ -141,7 +141,7 @@ def download_dataset(
         files_data = files_response.json()
 
         # 응답 구조 디버깅
-        print(f"\n응답 구조 확인:")
+        print("\n응답 구조 확인:")
         print(
             f"응답 키: {list(files_data.keys()) if isinstance(files_data, dict) else 'Not a dict'}"
         )
@@ -220,14 +220,14 @@ def download_dataset(
 
                     if response.status_code == 200:
                         file_response = response
-                        print(f"  ✅ 다운로드 성공")
+                        print("  ✅ 다운로드 성공")
                         break
 
                 except Exception:
                     continue
 
             if not file_response or file_response.status_code != 200:
-                print(f"  ✗ 모든 다운로드 URL 실패")
+                print("  ✗ 모든 다운로드 URL 실패")
                 continue
 
             # 파일 크기 확인
@@ -245,12 +245,12 @@ def download_dataset(
                         print(
                             f"  ℹ️  메타데이터 응답 감지 (실제 크기: {metadata.get('sizeBytes')} bytes)"
                         )
-                        print(f"  ⚠️  실제 파일 다운로드 엔드포인트를 찾을 수 없습니다")
+                        print("  ⚠️  실제 파일 다운로드 엔드포인트를 찾을 수 없습니다")
 
                         # transactionRid를 사용한 다운로드 시도
                         transaction_rid = metadata.get("transactionRid")
                         if transaction_rid:
-                            print(f"  🔄 transactionRid를 사용하여 재시도...")
+                            print("  🔄 transactionRid를 사용하여 재시도...")
                             # 추가 시도할 수 있는 다른 패턴들
                             continue
                 except:

@@ -48,7 +48,7 @@ def clean_ksic_level4(input_file: str, output_file: str = None):
         print(df.head(10))
 
         # 중복 제거 전 통계
-        print(f"\n=== 중복 제거 전 통계 ===")
+        print("\n=== 중복 제거 전 통계 ===")
         print(f"총 행 수: {len(df)}")
         print(f"중복 행 수: {len(df) - len(df.drop_duplicates())}")
 
@@ -56,7 +56,7 @@ def clean_ksic_level4(input_file: str, output_file: str = None):
         df_cleaned = df.drop_duplicates()
 
         # 중복 제거 후 통계
-        print(f"\n=== 중복 제거 후 통계 ===")
+        print("\n=== 중복 제거 후 통계 ===")
         print(f"총 행 수: {len(df_cleaned)}")
         print(f"제거된 중복 행 수: {len(df) - len(df_cleaned)}")
 

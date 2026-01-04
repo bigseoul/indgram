@@ -1,7 +1,39 @@
 import re
+import sys
+from pathlib import Path
 from typing import Dict
 
 from bs4 import BeautifulSoup
+
+
+def _get_simplified_html(tag) -> str:
+    """
+    태그의 모든 속성(style, class 등)을 제거하고
+    핵심 구조와 텍스트만 남긴 HTML 문자열을 반환합니다.
+    """
+    from bs4 import NavigableString, Tag
+
+    if isinstance(tag, NavigableString):
+        return str(tag).strip()
+
+    if not isinstance(tag, Tag):
+        return ""
+
+    # 자식 노드들을 먼저 단순화
+    inner_html = "".join(_get_simplified_html(child) for child in tag.children).strip()
+
+    # 내용이 없는 비본질적인 태그는 제거 (단, 테이블 셀은 구조상 유지)
+    if not inner_html and tag.name not in ["td", "th", "tr"]:
+        return ""
+
+    # 테이블 구조를 위한 속성(colspan, rowspan)은 보존
+    attrs_str = ""
+    if tag.name in ["td", "th"]:
+        for attr in ["colspan", "rowspan"]:
+            if tag.has_attr(attr):
+                attrs_str += f' {attr}="{tag[attr]}"'
+
+    return f"<{tag.name}{attrs_str}>{inner_html}</{tag.name}>"
 
 
 def _normalize(text: str) -> str:
@@ -71,39 +103,9 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
     global_meta = _extract_global_meta(soup)
 
     general_keywords = ["1. 일반사항", "1. 회사의 개요", "1. 일반적인 사항"]
-    data_keywords = ["지분율"]
-    term_markers = [
-        "당기",
-        "당기말",
-        "당기 말",
-        "현재",
-        "제 3 기",
-        "제 3기",
-        "제 15 기",
-        "제15기",
-        "당기",
-        "당기말",
-        "당기 말",
-        "현재",
-        "제 3 기",
-        "제 3기",
-        "제 15 기",
-        "제15기",
-        "전기",
-        "전기말",
-        "전기 말",
-        "제 2 기",
-        "제 2기",
-        "제 14 기",
-        "제14기",
-    ]
-    exclude_keywords = [
-        "비지배지분율",
-        "비지배지분",
-        "현금흐름",
-        "재무상태",
-        "손익계산",
-    ]
+    data_keywords = ["지분율", "종속", "관계"]
+    term_markers = ["당기", "당기말", "당기 말", "현재"]
+    exclude_keywords = ["비지배지분율", "비지배지분"]
 
     header = [
         "[META]",
@@ -148,7 +150,7 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
                 if t not in seen_elements:
                     # 주석 패턴 재확인
                     if not re.match(r"^\s*[\(\{\[]?[\*주]\d+", t.get_text().strip()):
-                        block_content.append(str(t))
+                        block_content.append(_get_simplified_html(t))
                         seen_elements.add(t)
                         # 자식 요소들도 seen_elements에 추가
                         if hasattr(t, "find_all"):
@@ -163,8 +165,8 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
 
         # 2. '지분율' 키워드: 테이블 위주로 탐색
         elif any(kw in raw_text for kw in data_keywords):
-            # 앵커 태그가 너무 길면(테이블 본문 등) 무시하여 중복 방지
-            if len(raw_text) > 300 and tag.name != "table":
+            # 앵커 태그가 너무 길면 무시하되, div나 table은 내부 검색을 위해 허용
+            if len(raw_text) > 500 and tag.name not in ["table", "div"]:
                 idx += 1
                 continue
 
@@ -172,9 +174,9 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
             if tag.name == "table":
                 target_table = tag
             else:
-                # 다음 5개 노드 내에서 테이블 탐색
+                # 다음 10개 노드 내에서 테이블 탐색
                 search_idx = idx + 1
-                for _ in range(5):
+                for _ in range(10):
                     if search_idx >= len(all_tags):
                         break
                     if all_tags[search_idx].name == "table":
@@ -212,16 +214,27 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
                         )
 
                         if is_marker or is_metadata_node:
-                            term_context_tags.insert(0, str(p_node))
+                            term_context_tags.insert(0, _get_simplified_html(p_node))
                         search_curr = p_node
 
-                    if any(m in term_context_text for m in term_markers):
+                    # 테이블 헤더 자체에서도 시점 마커 확인 (상위 3줄까지 확인)
+                    header_text = (
+                        target_table.thead.get_text() if target_table.thead else ""
+                    )
+                    if not header_text:
+                        # thead가 없는 경우 상위 3개의 tr을 합쳐서 확인
+                        header_rows = target_table.find_all("tr")[:3]
+                        header_text = " ".join(r.get_text() for r in header_rows)
+
+                    if any(m in term_context_text for m in term_markers) or any(
+                        m in header_text for m in term_markers
+                    ):
                         # Anchor 텍스트 정제
                         clean_anchor = re.sub(r"\s+", " ", raw_text[:150]).strip()
                         title_info = f"<p><b>[Anchor]</b> {clean_anchor}</p>"
                         context_html = "\n".join(term_context_tags)
                         evidence.append(
-                            f"[DATA-TABLE-HTML]\n{title_info}\n{context_html}\n{str(target_table)}"
+                            f"[DATA-TABLE-HTML]\n{title_info}\n{context_html}\n{_get_simplified_html(target_table)}"
                         )
 
                         # 타겟 테이블과 앵커 태그, 그리고 그 자식들을 모두 seen 처리
@@ -238,9 +251,15 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
 
 
 if __name__ == "__main__":
-    from pathlib import Path
+    # 텍스트 카운터 모듈 경로 추가
+    sys.path.append(str(Path(__file__).resolve().parent.parent.parent / "tokenizer"))
+    try:
+        from token_counter import count_tokens_from_text, count_tokens_gemini
+    except ImportError:
+        count_tokens_from_text = None
+        count_tokens_gemini = None
 
-    test_file = Path(__file__).resolve().parent / "sample" / "sample.html"
+    test_file = Path(__file__).resolve().parent / "sample" / "투믹스홀딩스.html"
     if not test_file.exists():
         print(f"Error: {test_file} 파일을 찾을 수 없습니다.")
     else:
@@ -248,3 +267,18 @@ if __name__ == "__main__":
         soup = BeautifulSoup(content, "html.parser")
         result = extract_evidence_blocks(soup)
         print(result)
+
+        if count_tokens_from_text:
+            tokens_gpt = count_tokens_from_text(result, model_name="gpt-5-nano")
+            tokens_gemini = (
+                count_tokens_gemini(result) if count_tokens_gemini else "N/A"
+            )
+
+            print("\n" + "=" * 50)
+            print("📊 Token Analysis (Extracted Content):")
+            print(f"   Characters: {len(result):,}")
+            print(f"   GPT Tokens: {tokens_gpt:,}")
+            print(
+                f"   Gemini Tokens: {tokens_gemini if isinstance(tokens_gemini, str) else f'{tokens_gemini:,}'}"
+            )
+            print("=" * 50)

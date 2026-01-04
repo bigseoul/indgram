@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 from html_extractor import extract_evidence_blocks
 
 # 현재 디렉토리를 path에 추가하여 임포트 가능하게 설정
+SAMPLE = "투믹스홀딩스.html"
+
 current_dir = Path(__file__).resolve().parent
 if str(current_dir) not in sys.path:
     sys.path.append(str(current_dir))
@@ -80,7 +82,7 @@ def print_comparison_table(gemini_res, gpt_res):
 
 
 def main():
-    source_file = current_dir / "sample" / "sample.html"
+    source_file = current_dir / "sample" / SAMPLE
     if not source_file.exists():
         print(f"Error: {source_file} 파일을 찾을 수 없습니다.")
         return

@@ -3,42 +3,26 @@
   "as_of_date": null,
   "major_shareholders": [
     {
-      "shareholder": "권경훈",
-      "ownership_ratio": 63.67
+      "shareholder": "Terapin Studios, INC.",
+      "ownership_ratio": 88.42
     },
     {
-      "shareholder": "김정규",
-      "ownership_ratio": 29.25
-    },
-    {
-      "shareholder": "김동준",
-      "ownership_ratio": 7.08
+      "shareholder": "테라핀",
+      "ownership_ratio": 11.58
     }
   ],
   "investments": [
     {
-      "investee": "크레오에스지",
-      "ownership_ratio": 9.19
+      "investee": "투믹스",
+      "ownership_ratio": 29.98
     },
     {
-      "investee": "큐로홀딩스",
-      "ownership_ratio": 27.54
+      "investee": "수성웹툰",
+      "ownership_ratio": 52.3
     },
     {
-      "investee": "Inferrex, Ltd.",
-      "ownership_ratio": 41.85
-    },
-    {
-      "investee": "필리에라",
-      "ownership_ratio": 33.33
-    },
-    {
-      "investee": "지엔코",
-      "ownership_ratio": 4.63
-    },
-    {
-      "investee": "홍익재",
-      "ownership_ratio": 50.0
+      "investee": "송옥에프앤비",
+      "ownership_ratio": 49.0
     }
   ]
 }

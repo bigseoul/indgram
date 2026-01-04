@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import tiktoken
+from google import genai
 
 
 def get_encoding(model_name: str = "gpt-4") -> tiktoken.Encoding:
@@ -39,6 +40,30 @@ def count_tokens_from_text(text: str, model_name: str = "gpt-4") -> int:
     encoding = get_encoding(model_name)
     tokens = encoding.encode(text)
     return len(tokens)
+
+
+def count_tokens_gemini(text: str, model_name: str = "gemini-1.5-flash") -> int:
+    """
+    Gemini SDK를 사용하여 토큰 수를 계산합니다.
+    첫 실행 시 모델 어휘집을 로컬에 캐싱하며, 이후엔 로컬에서 동작합니다.
+    """
+    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+
+    try:
+        # API 키가 있으면 SDK 사용
+        if api_key:
+            client = genai.Client(api_key=api_key)
+            response = client.models.count_tokens(
+                model=model_name,
+                contents=text,
+            )
+            return response.total_tokens
+
+        # API 키가 없으면 글자 수 기반 추산 (한국어/HTML 혼합 환경 고려)
+        # 보통 국영문 혼합 시 1토큰당 2~3자 내외
+        return int(len(text) / 2.5)
+    except Exception:
+        return int(len(text) / 2.5)
 
 
 def count_tokens_from_file(

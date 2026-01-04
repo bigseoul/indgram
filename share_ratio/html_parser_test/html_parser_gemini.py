@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from google import genai
 
 # 분리된 추출 모듈 임포트
-from html_extractor import extract_evidence_blocks
+from html_extractor_v4 import extract_evidence_blocks
 from pydantic import BaseModel, ConfigDict, Field
 
 # .env 파일 로드

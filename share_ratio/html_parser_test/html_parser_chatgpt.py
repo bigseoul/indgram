@@ -6,7 +6,7 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from html_extractor import extract_evidence_blocks
+from html_extractor_v4 import extract_evidence_blocks
 from pydantic import BaseModel, ConfigDict, Field
 
 load_dotenv()

@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from html_extractor import extract_evidence_blocks
 
 # 현재 디렉토리를 path에 추가하여 임포트 가능하게 설정
-SAMPLE = "투믹스홀딩스.html"
+SAMPLE = "코원.html"
 
 current_dir = Path(__file__).resolve().parent
 if str(current_dir) not in sys.path:

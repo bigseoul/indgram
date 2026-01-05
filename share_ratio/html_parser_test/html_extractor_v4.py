@@ -6,7 +6,7 @@ from typing import Dict
 
 from bs4 import BeautifulSoup
 
-SAMPLE = "투믹스홀딩스.html"
+SAMPLE = "코원.html"
 
 # 주석 및 footnote 패턴: (*1), (주1), *1, [1], 주1 등 대응
 FOOTNOTE_PATTERN = re.compile(

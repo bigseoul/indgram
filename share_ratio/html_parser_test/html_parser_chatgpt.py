@@ -6,13 +6,13 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from html_extractor_v4 import extract_evidence_blocks
+from html_extractor_v5 import extract_evidence_blocks
 from pydantic import BaseModel, ConfigDict, Field
 
 load_dotenv()
 
 MODEL_NAME = "gpt-5-mini-2025-08-07"
-SAMPLE = "투믹스홀딩스.html"
+SAMPLE = "kpartners.html"
 
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
@@ -39,7 +39,7 @@ def _post_chat_completion(prompt: str) -> str:
         "response_format": {"type": "json_object"},
     }
 
-    response = requests.post(url, headers=headers, json=payload, timeout=60)
+    response = requests.post(url, headers=headers, json=payload, timeout=120)
     if response.status_code != 200:
         print(f"OpenAI API error: {response.status_code} {response.text}")
         response.raise_for_status()
@@ -90,6 +90,9 @@ def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
 4. 명칭 정제(Normalization):
    - 반드시 제거: '(주)', '(주 )', '주식회사', '(유)', '(유한)', '유한회사', '(재)', '재단법인' 등 모든 국문 법인격 기호.
    - 반드시 제거: '(*1)', '(주1)', '*1', '주1' 등 모든 형태의 주석 번호 및 기호.
+   - 원문 유지(Exact Extraction): 주주명 및 기업명은 [Context] 본문에 기재된 원문 그대로를 추출하되, 자의적인 생략이나 수정을 금지함.
+   - 단일 항목 유지(No Splitting): '대표이사와 그 특수관계인'과 같이 본문에 하나의 주체로 묶여서 설명된 경우, 절대 여러 항목으로 분리하지 말 것.
+   - 조사 제거(No Particles): 성명/사명 뒤에 붙는 조사('은/는/이/가', '의' 등)는 반드시 제거하고 명사형태만 추출하라. (예: "대표이사와 그 특수관계인이" -> "대표이사와 그 특수관계인")
    - 예: "㈜기업명(*1)" -> "기업명", "사명 주식회사" -> "사명"
 5. 수치 형식: 지분율은 float(숫자)로 기재. (단위 % 생략)
 

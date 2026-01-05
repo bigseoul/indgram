@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from google import genai
 
 # 분리된 추출 모듈 임포트
-from html_extractor_v4 import extract_evidence_blocks
+from html_extractor_v5 import extract_evidence_blocks
 from pydantic import BaseModel, ConfigDict, Field
 
 # .env 파일 로드
@@ -59,17 +59,24 @@ def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
 
 [Core Rules]
 1. 전수 조사(Exhaustive Search):
-   - 문서 내 '일반사항', '종속기업 현황', '관계기업 현황', '지분법적용투자', '매도가능자산' 등 지분율(%)이 명시된 모든 테이블과 텍스트를 분석하여 단 하나의 기업도 누락하지 마라.
+   - 문서 내 모든 지분율(%) 데이터를 분석하여 누락 없이 추출하라.
    - 채권(대출, 담보, CB/BW 등) 관계는 절대 제외.
-2. 의미 중심 매칭 (Semantic Mapping):
+2. 섹션 기반 분류 (Section-based Classification):
+   - [Section: ...] 정보를 활용하여 데이터의 성격을 판별하라.
+   - '회사의 개요', '일반사항' 섹션(또는 이와 유사한 도입부 섹션)에 초입에 등장하는 지분은 본 회사의 주주인 'major_shareholders'로 분류하라.
+   - 그 외의 섹션(투자, 증권 등)은 섹션 제목뿐만 아니라 표의 헤더(예: 피투자회사, 발행회사 vs 주주명)와 문맥을 분석하여 주주인지 투자처(investments)인지 신중히 판별하라.
+3. 의미 중심 매칭 (Semantic Mapping):
    - colspan/rowspan을 고려하여 '당기(말)' 지분율을 추출하라. 
    - 컬럼 순서나 명칭이 다르더라도 문맥을 해석하여 '기업명/성명'과 '지분율'을 정확히 매칭할 것.
    - 동일 Entity 중복 등장 시 '당기말' 보통주 지분율 하나만 남김.
-3. 명칭 정제(Normalization):
+4. 명칭 정제(Normalization):
    - 반드시 제거: '(주)', '(주 )', '주식회사', '(유)', '(유한)', '유한회사', '(재)', '재단법인' 등 모든 국문 법인격 기호.
    - 반드시 제거: '(*1)', '(주1)', '*1', '주1' 등 모든 형태의 주석 번호 및 기호.
+   - 원문 유지(Exact Extraction): 주주명 및 기업명은 [Context] 본문에 기재된 원문 그대로를 추출하되, 자의적인 생략이나 수정을 금지함.
+   - 단일 항목 유지(No Splitting): '대표이사와 그 특수관계인'과 같이 본문에 하나의 주체로 묶여서 설명된 경우, 절대 여러 항목으로 분리하지 말 것.
+   - 조사 제거(No Particles): 성명/사명 뒤에 붙는 조사('은/는/이/가', '의' 등)는 반드시 제거하고 명사형태만 추출하라. (예: "대표이사와 그 특수관계인이" -> "대표이사와 그 특수관계인")
    - 예: "㈜기업명(*1)" -> "기업명", "사명 주식회사" -> "사명"
-4. 수치 형식: 지분율은 float(숫자)로 기재.
+5. 수치 형식: 지분율은 float(숫자)로 기재. (단위 % 생략)
 
 [Context]
 {context_data}

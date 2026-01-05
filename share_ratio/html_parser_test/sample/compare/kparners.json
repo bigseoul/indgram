@@ -1,0 +1,26 @@
+{
+  "major_shareholders": [
+    {
+      "nm": "권경훈",
+      "trmend_posesn_stock_qota_rt": 63.67
+    },
+    {
+      "nm": "김정규",
+      "trmend_posesn_stock_qota_rt": 29.25
+    },
+    {
+      "nm": "김동준",
+      "trmend_posesn_stock_qota_rt": 7.08
+    }
+  ],
+  "investments": [
+    {
+      "inv_prm": "크레오에스지",
+      "trmend_blce_qota_rt": 9.19
+    },
+    {
+      "inv_prm": "큐로홀딩스",
+      "trmend_blce_qota_rt": 27.54
+    }
+  ]
+}

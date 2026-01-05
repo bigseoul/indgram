@@ -1,0 +1,26 @@
+{
+  "major_shareholders": [
+    {
+      "nm": "Terapin Studios, INC.",
+      "trmend_posesn_stock_qota_rt": 88.42
+    },
+    {
+      "nm": "테라핀",
+      "trmend_posesn_stock_qota_rt": 11.58
+    }
+  ],
+  "investments": [
+    {
+      "inv_prm": "투믹스",
+      "trmend_blce_qota_rt": 29.98
+    },
+    {
+      "inv_prm": "수성웹툰",
+      "trmend_blce_qota_rt": 52.3
+    },
+    {
+      "inv_prm": "송옥에프앤비",
+      "trmend_blce_qota_rt": 49.0
+    }
+  ]
+}

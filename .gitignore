@@ -122,7 +122,9 @@ Thumbs.db
 # Data files
 data/
 *.csv
-# *.json
+*.json
+!.vscode/settings.json
+!share_ratio/html_parser_test/sample/compare/*.json
 *.xlsx
 *.xls
 *.txt

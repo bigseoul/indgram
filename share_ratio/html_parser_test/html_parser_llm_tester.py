@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -7,7 +8,7 @@ from bs4 import BeautifulSoup
 from html_extractor_v6 import extract_evidence_blocks
 
 # 현재 디렉토리를 path에 추가하여 임포트 가능하게 설정
-SAMPLE = "코원.html"
+SAMPLE = "큐로홀딩스.html"
 
 current_dir = Path(__file__).resolve().parent
 if str(current_dir) not in sys.path:
@@ -79,6 +80,11 @@ def print_comparison_table(gemini_res, gpt_res):
             print(f"{inv_display:<20} | {g_val:<40} | {o_val:<40} {match}")
 
     print("=" * 110 + "\n")
+
+
+def clear_terminal():
+    # os.name이 'nt'이면 윈도우(cls), 아니면 맥/리눅스(clear) 실행
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 def main():

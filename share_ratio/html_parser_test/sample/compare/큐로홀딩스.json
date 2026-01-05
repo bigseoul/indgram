@@ -1,0 +1,74 @@
+{
+  "major_shareholders": [
+    {
+      "nm": "케이파트너스",
+      "trmend_posesn_stock_qota_rt": 27.54
+    },
+    {
+      "nm": "크레오에스지",
+      "trmend_posesn_stock_qota_rt": 7.74
+    },
+    {
+      "nm": "지엔코",
+      "trmend_posesn_stock_qota_rt": 8.39
+    },
+    {
+      "nm": "큐캐피탈파트너스",
+      "trmend_posesn_stock_qota_rt": 3.7
+    },
+    {
+      "nm": "큐로에프앤비",
+      "trmend_posesn_stock_qota_rt": 0.66
+    },
+    {
+      "nm": "원업플러스",
+      "trmend_posesn_stock_qota_rt": 1.82
+    },
+    {
+      "nm": "개인 특수관계인",
+      "trmend_posesn_stock_qota_rt": 5.63
+    },
+    {
+      "nm": "기타주주",
+      "trmend_posesn_stock_qota_rt": 44.52
+    }
+  ],
+  "investments": [
+    {
+      "inv_prm": "Curocom Energy, LLC.",
+      "trmend_blce_qota_rt": 63.65
+    },
+    {
+      "inv_prm": "에이트웍스",
+      "trmend_blce_qota_rt": 51.71
+    },
+    {
+      "inv_prm": "큐비트",
+      "trmend_blce_qota_rt": 59.08
+    },
+    {
+      "inv_prm": "큐로트레이더스",
+      "trmend_blce_qota_rt": 94.1
+    },
+    {
+      "inv_prm": "더원게임즈",
+      "trmend_blce_qota_rt": 18.18
+    },
+    {
+      "inv_prm": "일본정밀",
+      "trmend_blce_qota_rt": 11.46
+    },
+    {
+      "inv_prm": "크레오에스지",
+      "trmend_blce_qota_rt": 20.51
+    },
+    {
+      "inv_prm": "큐로에프앤비",
+      "trmend_blce_qota_rt": 41.42
+    },
+    {
+      "inv_prm": "블록체인유니버스",
+      "trmend_blce_qota_rt": 49.0
+    }
+  ]
+}

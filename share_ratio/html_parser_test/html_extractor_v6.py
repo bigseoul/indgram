@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 from pathlib import Path
@@ -5,7 +6,7 @@ from typing import Dict, List
 
 from bs4 import BeautifulSoup, NavigableString, Tag
 
-SAMPLE = "인스파이어인티그레이티드리조트.html"
+SAMPLE = "큐로홀딩스.html"
 
 # 주석 및 footnote 패턴: (*1), (주1), *1, [1], 주1 등 대응
 FOOTNOTE_PATTERN = re.compile(
@@ -219,6 +220,11 @@ def extract_evidence_blocks(soup: BeautifulSoup) -> str:
     return "\n---\n".join(evidence)
 
 
+def clear_terminal():
+    # os.name이 'nt'이면 윈도우(cls), 아니면 맥/리눅스(clear) 실행
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 if __name__ == "__main__":
     # 토큰 카운터 경로 설정 (indgram 루트를 path에 추가)
     root_path = Path(__file__).resolve().parent.parent.parent
@@ -246,7 +252,7 @@ if __name__ == "__main__":
         # 결과 저장
         output_file = test_file.parent / "html_extractor_result_v6.html"
         output_file.write_text(result, encoding="utf-8")
-
+        clear_terminal()
         print(result)
         print(f"\n[INFO] Result saved to: {output_file}")
 

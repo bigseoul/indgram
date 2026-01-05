@@ -14,8 +14,8 @@ from pydantic import BaseModel, ConfigDict, Field
 # .env 파일 로드
 load_dotenv()
 
-MODEL_NAME = "gemini-2.5-flash-lite"
-SAMPLE = "인스파이어인티그레이티드리조트.html"
+MODEL_NAME = "gemini-2.5-flash"
+SAMPLE = "큐로홀딩스.html"
 
 
 # Gemini API 설정
@@ -104,6 +104,11 @@ def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
         raise
 
 
+def clear_terminal():
+    # os.name이 'nt'이면 윈도우(cls), 아니면 맥/리눅스(clear) 실행
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 def main():
     # 파일 경로 설정
     source_file = Path(__file__).resolve().parent / "sample" / SAMPLE
@@ -126,6 +131,7 @@ def main():
         return
 
     # 2. LLM 처리
+    clear_terminal()
     print("Sending to LLM for structured analysis...", flush=True)
     try:
         result = extract_share_ratio_with_llm(context_data)

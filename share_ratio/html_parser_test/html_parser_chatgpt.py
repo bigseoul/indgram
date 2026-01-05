@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field
 load_dotenv()
 
 MODEL_NAME = "gpt-5-mini-2025-08-07"
-SAMPLE = "인스파이어인티그레이티드리조트.html"
+SAMPLE = "큐로홀딩스.html"
 
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
@@ -140,6 +140,11 @@ JSON only. No additional text.
         raise
 
 
+def clear_terminal():
+    # os.name이 'nt'이면 윈도우(cls), 아니면 맥/리눅스(clear) 실행
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 def main():
     source_file = Path(__file__).resolve().parent / "sample" / SAMPLE
 
@@ -147,6 +152,7 @@ def main():
         print(f"Error: {source_file} 파일을 찾을 수 없습니다.")
         return
 
+    clear_terminal()
     print(f"Reading file: {source_file}", flush=True)
     html_content = source_file.read_text(encoding="utf-8")
 

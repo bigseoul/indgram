@@ -1,11 +1,10 @@
 import sys
-import time
 from pathlib import Path
 
 import html_parser_chatgpt
 import html_parser_gemini
 from bs4 import BeautifulSoup
-from html_extractor_v5 import extract_evidence_blocks
+from html_extractor_v6 import extract_evidence_blocks
 
 # 현재 디렉토리를 path에 추가하여 임포트 가능하게 설정
 SAMPLE = "코원.html"
@@ -101,10 +100,8 @@ def main():
 
     # 1. Gemini
     print("\n[1/2] Gemini 분석 요청 중...")
-    start_time_gemini = time.time()
     try:
         gemini_result = html_parser_gemini.extract_share_ratio_with_llm(context_data)
-        duration_gemini = time.time() - start_time_gemini
         # 파일 저장 (기존 기능 유지)
         res_json = gemini_result.model_dump_json(indent=2, ensure_ascii=False)
         (source_file.parent / "result_gemini.json").write_text(
@@ -114,11 +111,9 @@ def main():
         print(f"Gemini 오류: {e}")
 
     # 2. ChatGPT
-    print(f"[2/2] ChatGPT 분석 요청 중... (Gemini 소요 시간: {duration_gemini:.2f}초)")
-    start_time_gpt = time.time()
+    print("[2/2] ChatGPT 분석 요청 중...")
     try:
         gpt_result = html_parser_chatgpt.extract_share_ratio_with_llm(context_data)
-        duration_gpt = time.time() - start_time_gpt
         # 파일 저장 (기존 기능 유지)
         res_json = gpt_result.model_dump_json(indent=2, ensure_ascii=False)
         (source_file.parent / "result_gpt.json").write_text(res_json, encoding="utf-8")
@@ -128,9 +123,6 @@ def main():
     # 3. 비교 출력
     if gemini_result and gpt_result:
         print_comparison_table(gemini_result, gpt_result)
-        print(
-            f"소요 시간 비교: Gemini {duration_gemini:.2f}초 vs ChatGPT {duration_gpt:.2f}초"
-        )
         print("테스트 완료: sample/ 폴더에 개별 JSON 파일이 저장되었습니다.")
     else:
         print(

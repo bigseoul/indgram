@@ -28,3 +28,29 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true
 }
+
+
+===
+
+antigravity
+{
+    "mcpServers": {
+        "context7": {
+            "serverUrl": "https://mcp.context7.com/mcp",
+            "headers": {
+                "CONTEXT7_API_KEY": "ctx7sk-21ed3816-db2f-4f31-a5ad-482ef583d371"
+            }
+        },
+        "serena": {
+            "command": "uvx",
+            "args": [
+                "--from",
+                "git+https://github.com/oraios/serena",
+                "serena",
+                "start-mcp-server",
+                "--transport",
+                "stdio"
+            ]
+        }
+    }
+}

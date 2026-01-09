@@ -28,6 +28,11 @@ client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 class ShareholderItem(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
     shareholder: str = Field(alias="nm", description="주주명 또는 주체명")
+    stock_kind: str = Field(
+        alias="stock_knd",
+        default="보통주",
+        description="주식의 종류 (보통주, 우선주 등)",
+    )
     ownership_ratio: float = Field(
         alias="trmend_posesn_stock_qota_rt", description="지분율 (단위: %)"
     )
@@ -69,7 +74,8 @@ def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
 3. 의미 중심 매칭 (Semantic Mapping):
    - c(colspan)/r(rowspan)을 고려하여 '당기(말)' 지분율을 추출하라. 
    - 컬럼 순서나 명칭이 다르더라도 문맥을 해석하여 '기업명/성명'과 '지분율'을 정확히 매칭할 것.
-   - 동일 Entity 중복 등장 시 '당기말' 보통주 지분율 하나만 남김.
+   - 주식 종류(보통주, 우선주)가 명시된 경우 'stock_knd'에 기록하라. 명시되지 않았거나 구분이 모호한 경우 "보통주"로 기록한다.
+   - 동일 Entity 중복 등장 시 '당기말' 지분율을 추출하되, 주식 종류별로 각각 추출할 것.
 4. 명칭 정제(Normalization):
    - 반드시 제거: '(주)', '(주 )', '주식회사', '(유)', '(유한)', '유한회사', '(재)', '재단법인' 등 모든 국문 법인격 기호.
    - 반드시 제거: '(*1)', '(주1)', '*1', '주1' 등 모든 형태의 주석 번호 및 기호.
@@ -81,7 +87,7 @@ def extract_share_ratio_with_llm(context_data: str) -> CorporateStructure:
 [Output Format]
 JSON only. No additional text.
 {
-  "major_shareholders": [{ "nm": "str", "trmend_posesn_stock_qota_rt": float }],
+  "major_shareholders": [{ "nm": "str", "stock_knd": "str", "trmend_posesn_stock_qota_rt": float }],
   "investments": [{ "inv_prm": "str", "trmend_blce_qota_rt": float }]
 }"""
 

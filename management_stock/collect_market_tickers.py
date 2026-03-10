@@ -47,7 +47,7 @@ def save_parquet(df: pd.DataFrame, output_path: str | Path) -> Path:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output-dir", default="zombie/data")
+    parser.add_argument("--output-dir", default="management_stock/data")
     return parser.parse_args()
 
 

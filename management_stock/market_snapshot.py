@@ -14,7 +14,7 @@ from pykrx.website.naver.wrap import get_market_ohlcv_by_date
 MarketType = Literal["KOSPI", "KOSDAQ"]
 
 DEFAULT_BASE_DATE = "20260309"  # 전일 또는 당일(장마감 후) 종가 기준으로.
-DEFAULT_TICKERS_PATH = Path("zombie/data/market_tickers_20260310.parquet")
+DEFAULT_TICKERS_PATH = Path("management_stock/data/market_tickers_20260310.parquet")
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 RESULT_COLUMNS = [
     "market",
@@ -294,7 +294,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--request-sleep", type=float, default=0.0)
     parser.add_argument("--limit-per-market", type=int, default=None)
     parser.add_argument("--tickers-path", default=str(DEFAULT_TICKERS_PATH))
-    parser.add_argument("--output-dir", default="zombie/data")
+    parser.add_argument("--output-dir", default="management_stock/data")
     parser.add_argument("--output-stem", default="market_snapshot")
     return parser.parse_args()
 

@@ -13,8 +13,8 @@ from pykrx.website.naver.wrap import get_market_ohlcv_by_date
 
 MarketType = Literal["KOSPI", "KOSDAQ"]
 
-DEFAULT_BASE_DATE = "20260306"
-DEFAULT_TICKERS_PATH = Path("zombie/data/market_tickers_20260306.parquet")
+DEFAULT_BASE_DATE = "20260309"  # 전일 또는 당일(장마감 후) 종가 기준으로.
+DEFAULT_TICKERS_PATH = Path("zombie/data/market_tickers_20260310.parquet")
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 RESULT_COLUMNS = [
     "market",
@@ -163,8 +163,8 @@ def get_market_snapshot(
         df = df.head(limit).copy()
 
     total = len(df)
-    completed_mask = (
-        (progress_df["market"] == market) & (progress_df["base_date"] == base_date)
+    completed_mask = (progress_df["market"] == market) & (
+        progress_df["base_date"] == base_date
     )
     completed_tickers = set(progress_df.loc[completed_mask, "ticker"].tolist())
     pending_df = df.loc[~df["ticker"].isin(completed_tickers)].copy()
@@ -179,11 +179,7 @@ def get_market_snapshot(
             ticker = row.ticker
             name = row.name
             current_index = completed + index
-            if (
-                index == 1
-                or current_index % 20 == 0
-                or current_index == total
-            ):
+            if index == 1 or current_index % 20 == 0 or current_index == total:
                 print(f"[{market}] {current_index}/{total} {ticker} {name}")
 
             try:
@@ -224,10 +220,7 @@ def get_market_snapshot(
                     keep="last",
                 ).reset_index(drop=True)
                 save_errors(error_df[ERROR_COLUMNS], error_path)
-                print(
-                    f"[{market}] skip: {ticker} {name} "
-                    f"({type(exc).__name__}: {exc})"
-                )
+                print(f"[{market}] skip: {ticker} {name} ({type(exc).__name__}: {exc})")
                 continue
 
             if request_sleep > 0:

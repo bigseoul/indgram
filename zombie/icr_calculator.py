@@ -5,6 +5,8 @@ from typing import Any
 
 import pandas as pd
 
+from zombie.common_io import is_blank
+
 RAW_COLUMNS = (
     "market",
     "stock_code",
@@ -28,16 +30,6 @@ EXACT_INTEREST_ACCOUNT_NAMES = ("이자비용", "이자비용(손실)", "Interes
 EXACT_INTEREST_ACCOUNT_IDS = ("InterestExpense",)
 PROXY_INTEREST_ACCOUNT_NAMES = ("금융비용", "금융원가", "FinanceCosts")
 PROXY_INTEREST_ACCOUNT_IDS = ("FinanceCosts",)
-
-
-def is_blank(value: Any) -> bool:
-    if value is None:
-        return True
-    if isinstance(value, str):
-        return value.strip() == ""
-    return bool(pd.isna(value))
-
-
 def normalize_account_text(value: Any) -> str:
     if value is None:
         return ""

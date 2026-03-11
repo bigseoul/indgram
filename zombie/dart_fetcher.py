@@ -12,17 +12,28 @@ from typing import Any, Callable, Iterable
 import pandas as pd
 import requests
 
-DEFAULT_INPUT_PATH = Path("zombie/data/market_tickers_with_corp_code.csv")
 DEFAULT_CHECKPOINT_DIR = Path("zombie/data/checkpoints")
 DEFAULT_PROGRESS_PATH = DEFAULT_CHECKPOINT_DIR / "fetch_progress.parquet"
 DEFAULT_ERROR_PATH = DEFAULT_CHECKPOINT_DIR / "fetch_errors.parquet"
 DEFAULT_RAW_PARQUET_PATH = DEFAULT_CHECKPOINT_DIR / "icr_extract_2022_2024_long.parquet"
-DEFAULT_MARKETS = ("KOSPI", "KOSDAQ")
 DEFAULT_YEARS = (2022, 2023, 2024)
 REPORT_CODE = "11011"
 API_KEY_ENV_VARS = ("DART_API_KEY", "OPEN_DART_API_KEY", "DART_FSS_API_KEY")
 
-INPUT_COLUMNS = ("market", "name", "stock_code", "corp_code")
+from zombie.common_io import (
+    DEFAULT_INPUT_PATH,
+    DEFAULT_MARKETS,
+    INPUT_COLUMNS,
+    ensure_parent,
+    is_blank,
+    load_input_universe,
+    load_parquet_frame,
+    normalize_stock_code,
+    save_parquet_frame,
+    upsert_rows,
+    utc_now,
+)
+
 PROGRESS_COLUMNS = (
     "market",
     "stock_code",
@@ -73,40 +84,6 @@ def get_default_api_key() -> str:
     content = corp_list_path.read_text(encoding="utf-8")
     match = re.search(r'^API_KEY\s*=\s*"([^"]+)"', content, re.MULTILINE)
     return match.group(1) if match else ""
-
-
-def normalize_stock_code(value: Any) -> str:
-    text = str(value or "").strip().upper()
-    if not text:
-        return ""
-    return text.zfill(6) if len(text) < 6 else text
-
-
-def is_blank(value: Any) -> bool:
-    if value is None:
-        return True
-    if isinstance(value, str):
-        return value.strip() == ""
-    return bool(pd.isna(value))
-
-
-def utc_now() -> str:
-    return pd.Timestamp.utcnow().isoformat()
-
-
-def load_input_universe(input_path: str | Path = DEFAULT_INPUT_PATH) -> pd.DataFrame:
-    path = Path(input_path)
-    df = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
-
-    missing = set(INPUT_COLUMNS).difference(df.columns)
-    if missing:
-        raise ValueError(f"input CSV is missing columns: {sorted(missing)}")
-
-    df = df.loc[df["market"].isin(DEFAULT_MARKETS), list(INPUT_COLUMNS)].copy()
-    df["stock_code"] = df["stock_code"].map(normalize_stock_code)
-    df["corp_code"] = df["corp_code"].fillna("").astype(str).str.strip()
-    df["name"] = df["name"].fillna("").astype(str).str.strip()
-    return df.sort_values(["market", "stock_code"]).reset_index(drop=True)
 
 
 def load_corp_codes_frame(
@@ -196,34 +173,3 @@ def empty_progress_frame() -> pd.DataFrame:
 
 def empty_error_frame() -> pd.DataFrame:
     return pd.DataFrame(columns=ERROR_COLUMNS)
-
-
-def ensure_parent(path: str | Path) -> Path:
-    path_obj = Path(path)
-    path_obj.parent.mkdir(parents=True, exist_ok=True)
-    return path_obj
-
-
-def load_parquet_frame(path: str | Path, columns: Iterable[str]) -> pd.DataFrame:
-    path_obj = Path(path)
-    if not path_obj.exists():
-        return pd.DataFrame(columns=list(columns))
-
-    df = pd.read_parquet(path_obj)
-    for column in columns:
-        if column not in df.columns:
-            df[column] = pd.NA
-    return df[list(columns)].copy()
-
-
-def save_parquet_frame(df: pd.DataFrame, path: str | Path) -> Path:
-    path_obj = ensure_parent(path)
-    df.to_parquet(path_obj, index=False)
-    return path_obj
-
-
-def upsert_rows(existing_df: pd.DataFrame, row_df: pd.DataFrame, key_columns: list[str]) -> pd.DataFrame:
-    if existing_df.empty:
-        return row_df.drop_duplicates(subset=key_columns, keep="last").reset_index(drop=True)
-    combined = pd.concat([existing_df, row_df], ignore_index=True)
-    return combined.drop_duplicates(subset=key_columns, keep="last").reset_index(drop=True)

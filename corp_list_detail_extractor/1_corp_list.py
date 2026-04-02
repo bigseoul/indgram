@@ -13,7 +13,7 @@ import dart_fss as dart
 
 # 설정
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, "fsdata")
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "data")
 API_KEY = "82f7e55fddad2d097811929b56b5eaf6716825a3"
 
 # 출력 파일 경로
